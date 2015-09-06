@@ -172,11 +172,4 @@ public class CrimeFragment extends Fragment {
     }
 
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-
-        getActivity().getMenuInflater().inflate(R.menu.crime_list_item_context, menu);
-
-    }
 }
