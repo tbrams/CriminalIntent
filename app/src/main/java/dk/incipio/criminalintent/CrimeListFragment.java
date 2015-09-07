@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -53,6 +55,7 @@ public class CrimeListFragment extends ListFragment {
         ListView view = (ListView)v.findViewById(android.R.id.list);
         view.setEmptyView(v.findViewById(android.R.id.empty));
 
+
         addCrimeButton = (Button)v.findViewById(R.id.initialCrimeButton);
         addCrimeButton.setOnClickListener(new View.OnClickListener()
         {
@@ -73,7 +76,43 @@ public class CrimeListFragment extends ListFragment {
         }
 
         ListView listView = (ListView) v.findViewById(android.R.id.list);
-        registerForContextMenu(listView);
+        if (Build.VERSION.SDK_INT<Build.VERSION_CODES.HONEYCOMB) {
+            // Use floating context menu on Froyo and Honeycomb
+            registerForContextMenu(listView);
+        } else {
+            // Use contextual action bar for newer versions
+            listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+            listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+                @Override
+                public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+
+                }
+
+                @Override
+                public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                    MenuInflater inflater = mode.getMenuInflater();
+                    inflater.inflate(R.menu.crime_list_item_context, menu);
+
+                    return true;
+                }
+                
+
+                @Override
+                public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                    return false;
+                }
+
+                @Override
+                public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                    return false;
+                }
+
+                @Override
+                public void onDestroyActionMode(ActionMode mode) {
+
+                }
+            });
+        }
 
         return v;
 
