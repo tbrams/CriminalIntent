@@ -104,8 +104,24 @@ public class CrimeListFragment extends ListFragment {
 
                 @Override
                 public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                    return false;
+                    switch (item.getItemId()) {
+                        case R.id.menu_item_delete_crime:
+                            CrimeAdapter adapter = (CrimeAdapter) getListAdapter();
+                            CrimeLab crimeLab = CrimeLab.get(getActivity());
+                            for (int i = adapter.getCount()-1; i >=0 ; i--) {
+                                if (getListView().isItemChecked(i)){
+                                    crimeLab.deleteCrime(adapter.getItem(i));
+                                }
+                            }
+                            mode.finish();
+                            adapter.notifyDataSetChanged();
+                            return true;
+
+                        default:
+                            return false;
+                    }
                 }
+
 
                 @Override
                 public void onDestroyActionMode(ActionMode mode) {
