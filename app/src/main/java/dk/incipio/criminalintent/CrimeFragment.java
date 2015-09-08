@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -33,10 +35,14 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
     private Button mDateButton;
     private ImageButton mPhotoButton;
+    private ImageView mPhotoView;
 
     public static final String EXTRA_CRIME_ID="dk.incipio.criminalintent.crime_id";
+    private static final String TAG = "CrimeFragment";
     public static final String DIALOG_DATE="date";
     private static final int REQUEST_DATE=0;
+    private static final int REQUEST_PHOTO=1;
+    private static final String DIALOG_IMAGE = "image";
 
     public static CrimeFragment newInstance(UUID id) {
         Bundle args = new Bundle();
@@ -62,7 +68,7 @@ public class CrimeFragment extends Fragment {
 
     @TargetApi(11)
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_crime,parent,false);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -74,16 +80,28 @@ public class CrimeFragment extends Fragment {
         mTitleField = (EditText)v.findViewById(R.id.crime_title);
         mTitleField.setText(mCrime.getTitle());
         mPhotoButton = (ImageButton) v.findViewById(R.id.crime_imageButton);
+        mPhotoView = (ImageView)v.findViewById(R.id.crime_imageView);
+        mPhotoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Photo p = mCrime.getPhoto();
+                if (p == null) {
+                    return;
+                }
+                FragmentManager fm = getActivity().getSupportFragmentManager();
+                String path = getActivity().getFileStreamPath(p.getFilename()).getAbsolutePath();
+                ImageFragment.newInstance(path).show(fm, DIALOG_IMAGE);
+            }
+        });
 
         mPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getActivity(), CrimeCameraActivity.class);
-                startActivity(i);
+                startActivityForResult(i, REQUEST_PHOTO);
 
             }
         });
-
 
         // Disable ImageButton if the phone has no camera
         PackageManager pm = getActivity().getPackageManager();
@@ -141,6 +159,26 @@ public class CrimeFragment extends Fragment {
         return v;
     }
 
+    private void showPhoto() {
+        // reset the image button's image based on our photo
+        Photo p = mCrime.getPhoto();
+        BitmapDrawable b = null;
+
+        if (p != null) {
+            String path = getActivity().getFileStreamPath(p.getFilename()).getAbsolutePath();
+            b=PictureUtils.getScaledDownDrawable(getActivity(), path);
+        }
+
+        mPhotoView.setImageDrawable(b);
+
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        showPhoto();
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -154,6 +192,14 @@ public class CrimeFragment extends Fragment {
 
             // mDateButton.setText(mCrime.getDate().toString());
             updateDate();
+        } else if (requestCode==REQUEST_PHOTO) {
+            String fileName = data.getStringExtra(CrimeCameraFragment.EXTRA_PHOTO_FILENAME);
+            if (fileName != null) {
+                Photo p = new Photo(fileName);
+                mCrime.setmPhoto(p);
+                showPhoto();
+//                Log.i(TAG, "Crime: "+mCrime.getTitle()+" has a photo");
+            }
         }
 
     }
@@ -165,6 +211,11 @@ public class CrimeFragment extends Fragment {
         CrimeLab.get(getActivity()).saveCrimes();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        PictureUtils.cleanImageView(mPhotoView);
+    }
 
     private void updateDate() {
         DateFormat mDateFormat = android.text.format.DateFormat.getLongDateFormat(getActivity());

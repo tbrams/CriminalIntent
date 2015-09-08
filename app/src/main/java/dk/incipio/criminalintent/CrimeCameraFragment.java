@@ -1,7 +1,9 @@
 package dk.incipio.criminalintent;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import java.util.UUID;
 
 public class CrimeCameraFragment extends Fragment {
     private static final String TAG = "CrimeCameraFragment";
+    public static final String EXTRA_PHOTO_FILENAME = "dk.incipio.criminalintent.photo_filename";
     private Camera mCamera;
     private SurfaceView mSurfaceView;
     private View mProgressContainer;
@@ -61,7 +64,15 @@ public class CrimeCameraFragment extends Fragment {
             }
 
             if (success) {
-                Log.i(TAG, "JPG saved at " + fileName);
+                // Log.i(TAG, "JPG saved at " + fileName);
+
+                // set result as extra on calling activity - result intent
+                Intent i = new Intent();
+                i.putExtra(EXTRA_PHOTO_FILENAME, fileName);
+                getActivity().setResult(Activity.RESULT_OK, i);
+
+            } else {
+                getActivity().setResult(Activity.RESULT_CANCELED);
             }
             getActivity().finish();
         }
@@ -75,12 +86,12 @@ public class CrimeCameraFragment extends Fragment {
         mProgressContainer = v.findViewById(R.id.crime_camera_progressContainer);
         mProgressContainer.setVisibility(View.INVISIBLE);
 
-        v.setOnClickListener(new View.OnClickListener() {
+        takePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 if (mCamera != null) {
-                    mCamera.takePicture(mShutterCallback,null,mJpgCallback);
+                    mCamera.takePicture(mShutterCallback, null, mJpgCallback);
                 }
             }
         });
