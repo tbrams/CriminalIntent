@@ -3,6 +3,8 @@ package dk.incipio.criminalintent;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,7 +12,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -30,6 +32,7 @@ public class CrimeFragment extends Fragment {
     private EditText mTitleField;
     private CheckBox mSolvedCheckBox;
     private Button mDateButton;
+    private ImageButton mPhotoButton;
 
     public static final String EXTRA_CRIME_ID="dk.incipio.criminalintent.crime_id";
     public static final String DIALOG_DATE="date";
@@ -70,6 +73,24 @@ public class CrimeFragment extends Fragment {
 
         mTitleField = (EditText)v.findViewById(R.id.crime_title);
         mTitleField.setText(mCrime.getTitle());
+        mPhotoButton = (ImageButton) v.findViewById(R.id.crime_imageButton);
+
+        mPhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getActivity(), CrimeCameraActivity.class);
+                startActivity(i);
+
+            }
+        });
+
+
+        // Disable ImageButton if the phone has no camera
+        PackageManager pm = getActivity().getPackageManager();
+        boolean hasCamera = pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT) ||
+                (Build.VERSION.SDK_INT>=Build.VERSION_CODES.GINGERBREAD && Camera.getNumberOfCameras()>0);
+        if (!hasCamera) mPhotoButton.setEnabled(false);
+
         mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

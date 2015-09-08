@@ -77,9 +77,11 @@ public class CrimeListFragment extends ListFragment {
 
         ListView listView = (ListView) v.findViewById(android.R.id.list);
         if (Build.VERSION.SDK_INT<Build.VERSION_CODES.HONEYCOMB) {
+
             // Use floating context menu on Froyo and Honeycomb
             registerForContextMenu(listView);
         } else {
+
             // Use contextual action bar for newer versions
             listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
             listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
@@ -91,6 +93,7 @@ public class CrimeListFragment extends ListFragment {
                 @Override
                 public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                     MenuInflater inflater = mode.getMenuInflater();
+                    mode.setTitle("Actionbar title!");
                     inflater.inflate(R.menu.crime_list_item_context, menu);
 
                     return true;

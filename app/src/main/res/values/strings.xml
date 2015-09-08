@@ -16,4 +16,5 @@
     <string name="delete_crime">Delete</string>
     <string name="text_view">Please create your first entry</string>
     <string name="button_text">Create Entry</string>
+    <string name="take">Take!</string>
 </resources>
