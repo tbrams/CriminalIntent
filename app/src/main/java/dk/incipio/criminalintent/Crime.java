@@ -8,22 +8,22 @@ import java.util.UUID;
 
 
 public class Crime {
-    private UUID mId;
-    private String mTitle;
-    private Date mDate;
-    private boolean mSolved;
-    private Photo mPhoto;
-
     private static final String JSON_ID="id";
     private static final String JSON_TITLE="title";
     private static final String JSON_SOLVED="solved";
     private static final String JSON_DATE="date";
     private static final String JSON_PHOTO = "photo";
+    private static final String JSON_SUSPECT = "suspect";
 
+    private UUID mId;
+    private String mTitle;
+    private Date mDate;
+    private boolean mSolved;
+    private Photo mPhoto;
+    private String mSuspect;
 
     public Crime() {
-        // Generate a unique Identifier
-        mId=UUID.randomUUID();
+        mId=UUID.randomUUID();          // Generate a unique Identifier
         mDate = new Date();
         mSolved = false;
     }
@@ -37,6 +37,9 @@ public class Crime {
         mDate=new Date(json.getLong(JSON_DATE));
         if (json.has(JSON_PHOTO)) {
             mPhoto = new Photo(json.getJSONObject(JSON_PHOTO));
+        }
+        if (json.has(JSON_SUSPECT)) {
+            mSuspect = json.getString(JSON_SUSPECT);
         }
     }
 
@@ -55,6 +58,7 @@ public class Crime {
         json.put(JSON_DATE, mDate.getTime());
         if (mPhoto!=null) json.put(JSON_PHOTO, mPhoto.toJSON());
         json.put(JSON_SOLVED, mSolved);
+        json.put(JSON_SUSPECT, mSuspect);
 
         return json;
     }
@@ -71,7 +75,7 @@ public class Crime {
         return mPhoto;
     }
 
-    public void setmPhoto(Photo p) {
+    public void setPhoto(Photo p) {
         mPhoto = p;
     }
     public boolean isSolved() {
@@ -94,4 +98,8 @@ public class Crime {
     public void setTitle(String mTitle) {
         this.mTitle = mTitle;
     }
+
+    public String getSuspect() {return mSuspect;}
+    public void setSuspect(String suspect) {mSuspect=suspect;}
+
 }
