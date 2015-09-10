@@ -25,6 +25,8 @@ public abstract class SingleFragmentActivity extends FragmentActivity {
     }
 
     protected int getLayoutResId() {
+  //    For some reson the Nexus 10 emulator does not pick up any of the device specific res files// so
+  //    so I will have to hardcode the twopane layout for now, cannot waste more time on this silly issue :(
   //      return R.layout.activity_fragment;
         return R.layout.activity_twopane;
     }
