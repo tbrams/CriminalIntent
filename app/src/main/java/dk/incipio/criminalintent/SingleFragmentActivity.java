@@ -14,6 +14,7 @@ public abstract class SingleFragmentActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(getLayoutResId());
+
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragmentContainer);
         if (fragment == null) {
@@ -24,11 +25,12 @@ public abstract class SingleFragmentActivity extends FragmentActivity {
         }
     }
 
+    // Instead of hardcoded layout, use this function so
+    // subclasses like CrimeListActivity can overwrite and
+    // use own layout optionally
+
     protected int getLayoutResId() {
-  //    For some reson the Nexus 10 emulator does not pick up any of the device specific res files// so
-  //    so I will have to hardcode the twopane layout for now, cannot waste more time on this silly issue :(
-  //      return R.layout.activity_fragment;
-        return R.layout.activity_twopane;
+        return R.layout.activity_fragment;
     }
 
 }
