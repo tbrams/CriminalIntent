@@ -56,6 +56,8 @@ public class CrimePagerActivity extends FragmentActivity {
             }
         });
 
+
+        // Find the Crime Object in Question and make it active
         UUID crimeId = (UUID)getIntent().getSerializableExtra(CrimeFragment.EXTRA_CRIME_ID);
         for (int i = 0; i < mCrimes.size(); i++) {
             if (mCrimes.get(i).getId().equals(crimeId)) {
